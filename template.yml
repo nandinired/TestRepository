@@ -1,11 +1,53 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Python file including external library
+Parameters:
+  SecurityGroupIds:
+    Type: CommaDelimitedList
+    Default: sg-6559233c
+  SubnetIDs:
+    Type: CommaDelimitedList
+    Description: The list of SubnetIDs in your Virtual Private Cloud (VPC)
+    Default: subnet-1d115c41,subnet-82115eac
+    #Default: subnet-80c98eae,subnet-04878f4e,subnet-e19ce486,subnet-bfc9fbb0,subnet-0bc28757,subnet-96c847a8
+  EFSpath:
+    Type: String
+    Default: /mnt/access
+  AccessPointARN:
+    Type: String
+    Description: Access point ARN
+    Default: arn:aws:elasticfilesystem:us-east-1:402783855041:access-point/fsap-0308d0e14b32cee8d
+  RoleARN:
+    Type: String
+    Description: Role ARN
+    Default: arn:aws:iam::402783855041:role/lambda_efs
 Resources:
- SampleFunction:
-  Type: AWS::Lambda::Function
-  Properties:
-   Handler: Index.lambda_handler
-   Runtime: python3.8
-   FunctionName: SamplePython
-   CodeUri: ./src #Directory the source file is
+ HelloWorldFunction:
+    Type: AWS::Lambda::Function 
+    Properties:
+      Code:
+        ZipFile: |
+         import json
+         import os
+
+         def lambda_handler(event, context):
+             print("Before : ", os.listdir("/mnt/access"))
+             with open("/mnt/access/somefile3.txt", "w") as f:
+                f.write("Hello from Lambda")
+             print("After : ", os.listdir("/mnt/access"))
+                # TODO implement
+             return {
+                'statusCode': 200,
+                'body': json.dumps('Hello from Lambda!')
+            }
+      
+      Timeout: 3
+      Handler: index.lambda_handler
+      Runtime: python3.8
+      Role: !Ref RoleARN
+      VpcConfig:
+        SecurityGroupIds: !Ref SecurityGroupIds
+        SubnetIds: !Ref SubnetIDs
+      FileSystemConfigs:
+      - Arn: !Ref AccessPointARN
+        LocalMountPath: !Ref EFSpath
