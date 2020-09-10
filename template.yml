@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: Python file including external library
 Resources:
  SampleFunction:
-  Type: AWS::Serverless::Function
+  Type: AWS::Lambda::Function
   Properties:
    Handler: Index.lambda_handler
    Runtime: python3.8
