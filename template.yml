@@ -1,5 +1,4 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
 Description: Python file including external library
 Parameters:
   SecurityGroupIds:
@@ -22,7 +21,7 @@ Parameters:
     Description: Role ARN
     Default: arn:aws:iam::402783855041:role/lambda_efs
 Resources:
- HelloWorldFunction:
+ SampleFunction:
     Type: AWS::Lambda::Function 
     Properties:
       Code:
